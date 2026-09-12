@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spanish 15</title>
+<meta name="description" content="Vocabulary trainer for Spanish 15: flashcards, quizzes, matching, and conjugation drills for every word in the course.">
+<meta name="theme-color" content="#1C1B22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Spanish 15">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<style>
+@font-face{font-family:'Barlow';font-weight:400;font-style:normal;font-display:swap;src:url(./fonts/Barlow-Regular.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-weight:500;font-style:normal;font-display:swap;src:url(./fonts/Barlow-Medium.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-weight:600;font-style:normal;font-display:swap;src:url(./fonts/Barlow-SemiBold.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-weight:600;font-style:normal;font-display:swap;src:url(./fonts/BarlowCondensed-SemiBold.woff2) format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-style:normal;font-display:swap;src:url(./fonts/BarlowCondensed-Bold.woff2) format('woff2')}
+:root{
+  --ink:#1C1B22; --paper:#FFFFFF; --paper2:#F1F0EE; --muted:#6E6D75; --rule:#E4E3E0;
+  --ok:#1F9D55; --no:#D33F3F; --focus:#FFB300;
+  --r:14px;
+  --sans:'Barlow',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+  --cond:'Barlow Condensed','Barlow',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);font-size:17px;line-height:1.35;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+[hidden]{display:none !important}
+#app{max-width:520px;margin:0 auto;min-height:100dvh}
+
+/* ── Home / map ── */
+.home{padding:calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 40px)}
+.home-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px}
+.home-head h1{font-family:var(--cond);font-weight:700;font-size:46px;line-height:.95;letter-spacing:-.01em}
+.home-head .sub{color:var(--muted);font-size:15px;margin-top:8px}
+.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--paper2);flex:none}
+.express{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:30px}
+.express-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-radius:var(--r);
+  background:var(--ink);color:#fff;font-weight:600;text-align:left;min-height:58px}
+.express-btn.alt{background:var(--paper2);color:var(--ink)}
+.express-btn:disabled{opacity:.45}
+.count{background:rgba(255,255,255,.2);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:600}
+.line{margin-bottom:30px}
+.line-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.badge{width:34px;height:34px;border-radius:9px;background:var(--c);color:#fff;font-family:var(--cond);font-weight:700;font-size:22px;display:grid;place-items:center;flex:none}
+.line-title{font-family:var(--cond);font-weight:700;font-size:25px;line-height:1.05}
+.line-sub{color:var(--muted);font-size:14px}
+.stations{list-style:none;position:relative;margin-left:6px}
+.stations::before{content:"";position:absolute;left:11px;top:18px;bottom:18px;width:4px;background:var(--c);transform:translateX(-50%);border-radius:2px}
+.station{display:flex;align-items:center;gap:14px;width:100%;padding:10px 0;text-align:left;position:relative;border-radius:8px}
+.station:active{opacity:.55}
+.dot{flex:none;width:22px;height:22px;border-radius:50%;background:#fff;border:4px solid var(--c);position:relative}
+.dot::after{content:"";position:absolute;inset:2px;border-radius:50%;background:conic-gradient(var(--c) var(--p),transparent 0)}
+.dot.done::after{inset:-1px}
+.st-name{display:block;font-weight:500;font-size:17px;line-height:1.25}
+.st-meta{display:block;color:var(--muted);font-size:14px;margin-top:1px}
+
+/* ── Mode sheet ── */
+.scrim{position:fixed;inset:0;background:rgba(28,27,34,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom) + 20px);
+  border-top:6px solid var(--c);max-height:92dvh;overflow:auto}
+.sheet h2{font-family:var(--cond);font-weight:700;font-size:30px;line-height:1.02}
+.sheet .meta{color:var(--muted);font-size:15px;margin:6px 0 16px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper2);border-radius:12px;padding:4px;margin-bottom:14px}
+.seg button{padding:9px 6px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted);min-height:40px}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.modes{display:grid;gap:10px}
+.mode{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px 13px 16px;border-radius:var(--r);
+  background:var(--paper2);text-align:left;min-height:60px}
+.mode b{display:block;font-weight:600;font-size:17px}
+.mode small{display:block;color:var(--muted);font-size:14px;margin-top:1px}
+.mode .go{width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.check{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:15px;color:var(--ink)}
+.check input{width:22px;height:22px;accent-color:var(--c);flex:none}
+
+/* ── Play shell ── */
+.play{min-height:100dvh;background:var(--c);color:#fff;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px)}
+.play-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.play-top .close{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:20px;flex:none}
+.play-title{flex:1;font-weight:600;line-height:1.15;font-size:16px}
+.play-title small{display:block;font-weight:400;opacity:.8;font-size:14px}
+.play-count{font-family:var(--cond);font-weight:700;font-size:22px;white-space:nowrap}
+.bar{height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;background:#fff;transition:width .25s}
+.play-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.play-foot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.btn{min-height:56px;border-radius:var(--r);font-weight:600;font-size:17px;padding:12px 16px;background:#fff;color:var(--ink)}
+.btn.ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.75)}
+.btn.wide{grid-column:1/-1}
+.btn:disabled{opacity:.5}
+.lang{position:absolute;top:14px;left:18px;font-size:13px;color:var(--muted)}
+.word{font-family:var(--cond);font-weight:700;font-size:40px;line-height:1.05;overflow-wrap:anywhere}
+.word.long{font-size:30px}
+.word.xlong{font-size:23px;line-height:1.15}
+.hint{color:var(--muted);margin-top:10px;font-size:15px}
+
+/* Flashcards */
+.card-wrap{perspective:1200px}
+.card{display:block;position:relative;width:100%;min-height:min(420px,48dvh);transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.2,1);border-radius:20px}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;background:#fff;color:var(--ink);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:44px 22px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.tap{position:absolute;bottom:14px;left:0;right:0;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+
+/* Quiz / type / conjugate */
+.prompt{position:relative;background:#fff;color:var(--ink);border-radius:20px;padding:40px 22px 26px;text-align:center;min-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.person{display:inline-block;margin-top:14px;padding:6px 14px;border-radius:999px;background:var(--c);color:#fff;font-weight:600;font-size:16px}
+.options{display:grid;gap:10px}
+.opt{background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.4);color:#fff;border-radius:var(--r);padding:14px 16px;font-size:17px;font-weight:500;text-align:left;min-height:56px;transition:background .15s,opacity .15s}
+.opt.ok{background:var(--ok);border-color:var(--ok)}
+.opt.no{background:var(--no);border-color:var(--no)}
+.opt.dim{opacity:.45}
+.field{display:flex;flex-direction:column;gap:10px}
+input.answer{width:100%;min-height:58px;border-radius:var(--r);border:3px solid transparent;background:#fff;color:var(--ink);font-family:var(--cond);font-weight:600;font-size:24px;padding:10px 16px;-webkit-appearance:none;appearance:none}
+input.answer::placeholder{color:#9a99a1;font-weight:600}
+input.answer:focus-visible{outline:none;border-color:var(--ink)}
+input.answer.ok{border-color:var(--ok)}
+input.answer.no{border-color:var(--no)}
+.accents{display:flex;gap:6px;flex-wrap:wrap}
+.accents button{min-width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.18);font-size:18px;font-weight:500}
+.reveal{background:#fff;color:var(--ink);border-radius:var(--r);padding:14px 16px;font-size:17px}
+.reveal b{color:var(--no)}
+.reveal b.okc{color:var(--ok)}
+
+/* Match */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+.col{display:grid;gap:8px}
+.tile{background:#fff;color:var(--ink);border-radius:12px;padding:10px 10px;min-height:66px;font-weight:500;font-size:15px;line-height:1.2;display:grid;place-items:center;text-align:center;border:3px solid transparent;transition:opacity .25s;overflow-wrap:anywhere}
+.tile.sel{border-color:var(--ink)}
+.tile.done{opacity:.22;pointer-events:none}
+.tile.bad{animation:shake .32s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.tile.bad{animation:none;border-color:var(--no)}}
+.timer{grid-column:1/-1;text-align:center;font-family:var(--cond);font-weight:700;font-size:26px;opacity:.9;padding:12px}
+
+/* Summary */
+.summary{text-align:center}
+.score{font-family:var(--cond);font-weight:700;font-size:84px;line-height:1}
+.score .of{font-size:30px;opacity:.85}
+.sum-meta{opacity:.9;margin:6px 0 20px}
+.missed{list-style:none;background:#fff;color:var(--ink);border-radius:20px;padding:4px 18px;max-height:42dvh;overflow:auto;text-align:left}
+.missed li{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--rule);font-size:16px}
+.missed li:last-child{border-bottom:0}
+.missed .en{color:var(--muted);text-align:right}
+.clean{background:rgba(255,255,255,.14);border-radius:20px;padding:22px;font-weight:600}
+
+/* Settings */
+.setrows{display:grid;gap:10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px;border-radius:var(--r);background:var(--paper2);text-align:left;width:100%}
+.row b{display:block;font-weight:600}
+.row small{display:block;color:var(--muted);font-size:14px;margin-top:3px;line-height:1.35}
+.row input{width:22px;height:22px;accent-color:var(--ink);flex:none}
+.row.danger b{color:var(--no)}
+</style>
+</head>
+<body>
+<div id="app" aria-live="polite"></div>
+<noscript>This app needs JavaScript to run.</noscript>
+<script src="./vocab.js"></script>
+<script>
+(() => {
+"use strict";
+const D = window.SP15;
+const PERSONS = ["yo", "tú", "ella / él / usted", "nosotros", "ellos / ustedes"];
+const REFLEX = ["me", "te", "se", "nos", "se"];
+const STORE_KEY = "sp15.v1";
+const MODE_NAMES = {flash: "Flashcards", quiz: "Quiz", type: "Type it", match: "Match", conjugate: "Conjugate"};
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const chunk = (a, n) => { const out = []; for (let i = 0; i < a.length; i += n) out.push(a.slice(i, i + n)); return out; };
+const dedupe = items => { const seen = new Set(); return items.filter(i => seen.has(i.key) ? false : (seen.add(i.key), true)); };
+const sizeClass = s => s.length > 40 ? " xlong" : s.length > 18 ? " long" : "";
+const fmtTime = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+const ICON_SETTINGS = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2.6" fill="#F1F0EE"/><circle cx="15" cy="12" r="2.6" fill="#F1F0EE"/><circle cx="8" cy="17" r="2.6" fill="#F1F0EE"/></svg>';
+const ICON_GO = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+
+/* ── Persistence (falls back to memory if storage is unavailable) ── */
+let state = load();
+function load() {
+  try { const s = JSON.parse(localStorage.getItem(STORE_KEY)); if (s && s.stats) return {stats: s.stats, settings: Object.assign({dir: "mix", strict: false}, s.settings)}; } catch (e) {}
+  return {stats: {}, settings: {dir: "mix", strict: false}};
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+const st = k => state.stats[k] || {c: 0, w: 0, s: 0};
+function record(k, ok) { const s = st(k); if (ok) { s.c++; s.s++; } else { s.w++; s.s = 0; } s.t = Date.now(); state.stats[k] = s; save(); }
+const known = k => st(k).s >= 2;
+const weak = k => { const s = st(k); return s.w > 0 && s.s < 3; };
+
+/* ── Data shaping ── */
+const VERB_LINE = {id: "verbs", num: "V", title: "Conjugation drills", color: "#4A4860",
+  topics: Object.entries(D.verbSets).map(([k, s]) => ({id: "vs-" + k, name: s.name,
+    day: s.tense === "present" ? "Present tense" : s.tense === "preterite" ? "Preterite" : "Gerunds",
+    items: s.verbs.map(v => [v.inf, v.en]), verbSets: [k], verbOnly: true}))};
+const LINES = D.units.concat([VERB_LINE]);
+const TOPICS = {};
+const ALL = [];
+for (const u of LINES) for (const t of u.topics) {
+  t.unit = u; TOPICS[t.id] = t;
+  t.list = t.items.map(([es, en, hint]) => ({es, en, hint, key: es.toLowerCase(), topic: t, unit: u}));
+  if (!t.verbOnly) ALL.push(...t.list);
+}
+
+/* ── Conjugation ── */
+function conjugate(v, tense) {
+  if (tense === "gerund") { if (v.ger) return v.ger; const stem = v.inf.slice(0, -2); return v.inf.endsWith("ar") ? stem + "ando" : stem + "iendo"; }
+  if (v.forms) return v.forms;
+  let inf = v.inf, refl = false;
+  if (v.refl || inf.endsWith("se")) { refl = true; inf = inf.slice(0, -2); }
+  const end = inf.slice(-2), stem = inf.slice(0, -2);
+  let ends;
+  if (tense === "present") ends = end === "ar" ? ["o", "as", "a", "amos", "an"] : end === "er" ? ["o", "es", "e", "emos", "en"] : ["o", "es", "e", "imos", "en"];
+  else ends = end === "ar" ? ["é", "aste", "ó", "amos", "aron"] : ["í", "iste", "ió", "imos", "ieron"];
+  const forms = ends.map((e, i) => {
+    let s = stem;
+    if (tense === "present" && v.sc && i !== 3) { const [from, to] = v.sc.split(">"); const idx = s.lastIndexOf(from); if (idx >= 0) s = s.slice(0, idx) + to + s.slice(idx + from.length); }
+    return s + e;
+  });
+  if (tense === "present" && v.yo) forms[0] = v.yo;
+  return refl ? forms.map((f, i) => REFLEX[i] + " " + f) : forms;
+}
+function conjCombos(verbSetKeys) {
+  const combos = [];
+  for (const k of verbSetKeys) { const set = D.verbSets[k]; if (!set) continue;
+    for (const v of set.verbs) {
+      if (set.tense === "gerund") combos.push({v, tense: "gerund", p: -1});
+      else for (let p = 0; p < 5; p++) combos.push({v, tense: set.tense, p});
+    } }
+  return combos.map(c => ({...c, key: `conj:${c.v.inf}:${c.tense}:${c.p}`, answer: c.tense === "gerund" ? conjugate(c.v, "gerund") : conjugate(c.v, c.tense)[c.p]}));
+}
+function conjProgress(t) { const cs = conjCombos(t.verbSets); return cs.length ? cs.filter(c => st(c.key).s >= 1).length / cs.length : 0; }
+function topicProgress(t) { if (t.verbOnly) return conjProgress(t); const n = t.list.length; return n ? t.list.filter(i => known(i.key)).length / n : 0; }
+
+/* ── Answer checking ── */
+const stripAccents = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+function norm(s, strict) {
+  s = String(s).toLowerCase().replace(/\.{2,}/g, " ").replace(/[¿?¡!.,;:"“”'’]/g, " ").replace(/\s+/g, " ").trim();
+  return strict ? s : stripAccents(s);
+}
+const ART = "el|la|los|las|un|una|unos|unas";
+function expand(str) {
+  str = str.trim();
+  let m = str.match(new RegExp(`^(${ART}) \\/ (${ART}) (.+)$`, "i"));
+  if (m) return expand(m[3]).flatMap(r => [`${m[1]} ${r}`, `${m[2]} ${r}`]);
+  if (str.includes(" / ")) return str.split(" / ").flatMap(expand);
+  m = str.match(/^(.*?)(\S+)\/(\S+)$/);
+  if (m) {
+    const pre = m[1], a = m[2], b = m[3];
+    if (b === "a") return [pre + a, pre + (a.endsWith("o") ? a.slice(0, -1) + "a" : a + "a")];
+    if (b === "as") return [pre + a, pre + (a.endsWith("os") ? a.slice(0, -2) + "as" : a + "as")];
+    return [pre + a, pre + b];
+  }
+  return [str];
+}
+function variants(es) {
+  const bases = [es.replace(/\([^)]*\)/g, " "), es.replace(/[()]/g, " ")].map(s => s.replace(/\s+/g, " ").trim());
+  const out = new Set();
+  for (const b of bases) for (const v of expand(b)) { out.add(v); const noArt = v.replace(new RegExp(`^(${ART})\\s+`, "i"), ""); out.add(noArt); }
+  return [...out];
+}
+function matches(input, es) { const strict = state.settings.strict; const u = norm(input, strict); return !!u && variants(es).some(v => norm(v, strict) === u); }
+
+/* ── Sessions ── */
+let session = null;
+function promptSide() { const d = state.settings.dir; return d === "mix" ? (Math.random() < .5 ? "es" : "en") : d; }
+function ctxTopic(t) {
+  const kn = t.verbOnly ? Math.round(conjProgress(t) * 100) + "% of forms drilled" : `${t.list.filter(i => known(i.key)).length} of ${t.list.length} known`;
+  return {kind: "topic", topic: t, title: t.name, meta: `${t.day}. ${kn}.`, items: t.list, color: t.unit.color, verbSets: t.verbSets, verbOnly: !!t.verbOnly};
+}
+function ctxWeak() { const items = dedupe(ALL.filter(i => weak(i.key))); return {kind: "weak", title: "Weak words", meta: `${items.length} word${items.length === 1 ? "" : "s"} you've missed and haven't nailed since. Sessions use up to 25 at a time.`, items, color: "#1C1B22", verbSets: []}; }
+function ctxAll() { const items = dedupe(ALL); return {kind: "all", title: "Everything", meta: `A random 25 of all ${items.length} words in the course.`, items, color: "#1C1B22", verbSets: []}; }
+
+function start(mode, ctx, items) {
+  let list = shuffle(dedupe(items));
+  if (ctx.kind !== "topic") list = list.slice(0, mode === "match" ? 24 : 25);
+  session = {mode, ctx, items: list, idx: 0, results: [], startedAt: Date.now(), color: ctx.color, title: ctx.title};
+  if (mode === "conjugate") {
+    let qs = shuffle(conjCombos(ctx.verbSets));
+    qs.sort((a, b) => (st(a.key).s >= 1 ? 1 : 0) - (st(b.key).s >= 1 ? 1 : 0));
+    session.qs = qs.slice(0, 12);
+  }
+  if (mode === "match") { session.round = 0; session.rounds = chunk(list, 6); if (session.rounds.length > 1 && session.rounds[session.rounds.length - 1].length < 3) { const last = session.rounds.pop(); session.rounds[session.rounds.length - 1].push(...last); } }
+  render();
+}
+function render() {
+  if (!session) return renderHome();
+  ({flash: renderFlash, quiz: renderQuiz, type: renderType, match: renderMatch, conjugate: renderConj})[session.mode]();
+}
+function shell(body, foot, count, pct) {
+  const s = session;
+  app.innerHTML = `<div class="play" style="--c:${s.color}">
+    <div class="play-top"><button class="close" id="closeBtn" aria-label="Close">✕</button>
+      <div class="play-title">${esc(s.title)}<small>${MODE_NAMES[s.mode]}</small></div><div class="play-count">${count}</div></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="play-body">${body}</div>
+    <div class="play-foot">${foot}</div></div>`;
+  $("#closeBtn").onclick = () => { stopTimer(); session = null; renderHome(); };
+}
+function stopTimer() { if (session && session.timerId) { clearInterval(session.timerId); session.timerId = null; } }
+function pctOf(i, n) { return n ? Math.round(i / n * 100) : 0; }
+
+/* Flashcards */
+function renderFlash() {
+  const s = session; if (s.idx >= s.items.length) return renderSummary();
+  const it = s.items[s.idx];
+  if (!s.side) { s.side = promptSide(); s.flipped = false; }
+  const front = s.side === "es" ? it.es : it.en, back = s.side === "es" ? it.en : it.es;
+  shell(`<div class="card-wrap"><button class="card${s.flipped ? " flipped" : ""}" id="card" aria-label="Flashcard. Tap to flip.">
+      <span class="face front"><span class="lang">${s.side === "es" ? "Español" : "English"}</span><span class="word${sizeClass(front)}">${esc(front)}</span>${it.hint && s.side === "es" ? `<span class="hint">${esc(it.hint)}</span>` : ""}<span class="tap">Tap to flip</span></span>
+      <span class="face back"><span class="lang">${s.side === "es" ? "English" : "Español"}</span><span class="word${sizeClass(back)}">${esc(back)}</span></span></button></div>`,
+    `<button class="btn ghost" id="missBtn">Missed it</button><button class="btn" id="gotBtn">Got it</button>`,
+    `${s.idx + 1} / ${s.items.length}`, pctOf(s.idx, s.items.length));
+  $("#card").onclick = () => { s.flipped = !s.flipped; $("#card").classList.toggle("flipped", s.flipped); };
+  const next = ok => { record(it.key, ok); s.results.push({it, ok}); s.idx++; s.side = null; renderFlash(); };
+  $("#missBtn").onclick = () => next(false);
+  $("#gotBtn").onclick = () => next(true);
+}
+
+/* Quiz */
+function distractors(it, side, n) {
+  const field = side === "es" ? "en" : "es", ans = it[field];
+  const seen = new Set([ans.toLowerCase()]); const out = [];
+  const take = list => { for (const c of shuffle(list)) { if (out.length >= n) break; if (c.key === it.key) continue; const v = c[field]; if (seen.has(v.toLowerCase())) continue; seen.add(v.toLowerCase()); out.push(v); } };
+  take(it.topic.list); if (out.length < n) take(it.unit.topics.flatMap(t => t.list)); if (out.length < n) take(ALL);
+  return out;
+}
+function renderQuiz() {
+  const s = session; if (s.idx >= s.items.length) return renderSummary();
+  const it = s.items[s.idx];
+  if (!s.q) { const side = promptSide(); const answer = side === "es" ? it.en : it.es; s.q = {side, prompt: side === "es" ? it.es : it.en, answer, opts: shuffle([answer, ...distractors(it, side, 3)]), answered: false}; }
+  const q = s.q;
+  shell(`<div class="prompt"><span class="lang">${q.side === "es" ? "Español" : "English"}</span><div class="word${sizeClass(q.prompt)}">${esc(q.prompt)}</div>${it.hint && q.side === "es" ? `<div class="hint">${esc(it.hint)}</div>` : ""}</div>
+      <div class="options" id="opts">${q.opts.map((o, i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`,
+    `<button class="btn wide" id="nextBtn" hidden>Next</button>`, `${s.idx + 1} / ${s.items.length}`, pctOf(s.idx, s.items.length));
+  const advance = () => { s.idx++; s.q = null; renderQuiz(); };
+  $$(".opt").forEach(b => b.onclick = () => {
+    if (q.answered) return; q.answered = true;
+    const i = +b.dataset.i, ok = q.opts[i] === q.answer;
+    record(it.key, ok); s.results.push({it, ok});
+    $$(".opt").forEach((x, j) => { x.disabled = true; x.classList.add(q.opts[j] === q.answer ? "ok" : j === i ? "no" : "dim"); });
+    if (ok) setTimeout(() => { if (session === s && s.q === q) advance(); }, 650);
+    else { const nb = $("#nextBtn"); nb.hidden = false; nb.onclick = advance; nb.focus(); }
+  });
+}
+
+/* Type it */
+function accentBar() { return `<div class="accents" aria-label="Accented letters">${"áéíóúñü".split("").map(c => `<button type="button" data-c="${c}">${c}</button>`).join("")}</div>`; }
+function bindAccents(inp) {
+  $$(".accents button").forEach(b => b.onclick = () => { const a = inp.selectionStart ?? inp.value.length, z = inp.selectionEnd ?? a; inp.value = inp.value.slice(0, a) + b.dataset.c + inp.value.slice(z); inp.focus(); inp.setSelectionRange(a + 1, a + 1); });
+}
+function renderType() {
+  const s = session; if (s.idx >= s.items.length) return renderSummary();
+  const it = s.items[s.idx]; if (!s.q) s.q = {answered: false, ok: null, val: ""};
+  const q = s.q;
+  shell(`<div class="prompt"><span class="lang">English</span><div class="word${sizeClass(it.en)}">${esc(it.en)}</div>${it.hint ? `<div class="hint">${esc(it.hint)}</div>` : ""}</div>
+      <div class="field"><input class="answer${q.answered ? (q.ok ? " ok" : " no") : ""}" id="ans" type="text" lang="es" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="Type it in Spanish" value="${esc(q.val)}" ${q.answered ? "readonly" : ""} aria-label="Your answer">
+      ${q.answered ? `<div class="reveal">${q.ok ? "Correct" : "Answer"}: <b class="${q.ok ? "okc" : ""}">${esc(it.es)}</b></div>` : accentBar()}</div>`,
+    q.answered ? `<button class="btn wide" id="nextBtn">Next</button>` : `<button class="btn ghost" id="showBtn">Show answer</button><button class="btn" id="checkBtn">Check</button>`,
+    `${s.idx + 1} / ${s.items.length}`, pctOf(s.idx, s.items.length));
+  const inp = $("#ans");
+  const advance = () => { s.idx++; s.q = null; renderType(); };
+  if (!q.answered) {
+    inp.focus(); bindAccents(inp);
+    const check = forced => { q.val = inp.value; const ok = forced === undefined ? matches(inp.value, it.es) : forced; q.answered = true; q.ok = ok; record(it.key, ok); s.results.push({it, ok}); renderType();
+      if (ok) setTimeout(() => { if (session === s && s.q === q) advance(); }, 900); };
+    $("#checkBtn").onclick = () => { if (inp.value.trim()) check(); else inp.focus(); };
+    $("#showBtn").onclick = () => check(false);
+    inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); if (inp.value.trim()) check(); } };
+  } else { const nb = $("#nextBtn"); nb.onclick = advance; if (!q.ok) nb.focus(); }
+}
+
+/* Match */
+function renderMatch() {
+  const s = session; if (s.round >= s.rounds.length) return renderSummary();
+  const items = s.rounds[s.round];
+  const m = s.m = {left: shuffle(items.map(i => ({id: i.key, text: i.es}))), right: shuffle(items.map(i => ({id: i.key, text: i.en}))), selL: null, selR: null, done: new Set(), missed: new Set(), byKey: Object.fromEntries(items.map(i => [i.key, i]))};
+  const tile = (t, side) => `<button class="tile" data-side="${side}" data-id="${esc(t.id)}">${esc(t.text)}</button>`;
+  shell(`<div class="grid" id="grid"><div class="col">${m.left.map(t => tile(t, "l")).join("")}</div><div class="col">${m.right.map(t => tile(t, "r")).join("")}</div></div>`,
+    `<div class="timer" id="timer" aria-label="Elapsed time">${fmtTime(Math.round((Date.now() - s.startedAt) / 1000))}</div>`,
+    `Round ${s.round + 1} / ${s.rounds.length}`, pctOf(s.round, s.rounds.length));
+  stopTimer(); s.timerId = setInterval(() => { const t = $("#timer"); if (t) t.textContent = fmtTime(Math.round((Date.now() - s.startedAt) / 1000)); }, 1000);
+  const tiles = $$(".tile");
+  const paint = () => tiles.forEach(t => t.classList.toggle("sel", (t.dataset.side === "l" ? m.selL : m.selR) === t.dataset.id));
+  tiles.forEach(t => t.onclick = () => {
+    if (m.lock || m.done.has(t.dataset.id)) return;
+    if (t.dataset.side === "l") m.selL = m.selL === t.dataset.id ? null : t.dataset.id; else m.selR = m.selR === t.dataset.id ? null : t.dataset.id;
+    paint();
+    if (m.selL && m.selR) {
+      const L = tiles.filter(x => x.dataset.id === m.selL && x.dataset.side === "l")[0], R = tiles.filter(x => x.dataset.id === m.selR && x.dataset.side === "r")[0];
+      if (m.selL === m.selR) {
+        const key = m.selL; m.done.add(key); const ok = !m.missed.has(key); record(key, ok); s.results.push({it: m.byKey[key], ok});
+        [L, R].forEach(x => { x.classList.add("done"); x.disabled = true; });
+        m.selL = m.selR = null; paint();
+        if (m.done.size === items.length) { m.lock = true; setTimeout(() => { if (session === s) { s.round++; renderMatch(); } }, 550); }
+      } else {
+        m.missed.add(m.selL); m.missed.add(m.selR); m.lock = true;
+        [L, R].forEach(x => x.classList.add("bad"));
+        setTimeout(() => { [L, R].forEach(x => x.classList.remove("bad")); m.selL = m.selR = null; m.lock = false; paint(); }, 380);
+      }
+    }
+  });
+}
+
+/* Conjugate */
+function renderConj() {
+  const s = session; if (s.idx >= s.qs.length) return renderSummary();
+  const c = s.qs[s.idx]; if (!s.q) s.q = {answered: false, ok: null, val: ""};
+  const q = s.q, refl = c.v.refl || c.v.inf.endsWith("se");
+  const tense = c.tense === "present" ? "Present" : c.tense === "preterite" ? "Preterite" : "Present progressive";
+  const person = c.p < 0 ? "gerundio" : PERSONS[c.p];
+  const item = {key: c.key, es: `${c.v.inf}, ${person}`, en: c.answer};
+  shell(`<div class="prompt"><span class="lang">${tense}</span><div class="word">${esc(c.v.inf)}</div><div class="hint">${esc(c.v.en)}${refl ? " (include the pronoun)" : ""}</div><div class="person">${esc(person)}</div></div>
+      <div class="field"><input class="answer${q.answered ? (q.ok ? " ok" : " no") : ""}" id="ans" type="text" lang="es" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="Type the form" value="${esc(q.val)}" ${q.answered ? "readonly" : ""} aria-label="Your answer">
+      ${q.answered ? `<div class="reveal">${q.ok ? "Correct" : "Answer"}: <b class="${q.ok ? "okc" : ""}">${esc(c.answer)}</b></div>` : accentBar()}</div>`,
+    q.answered ? `<button class="btn wide" id="nextBtn">Next</button>` : `<button class="btn ghost" id="showBtn">Show answer</button><button class="btn" id="checkBtn">Check</button>`,
+    `${s.idx + 1} / ${s.qs.length}`, pctOf(s.idx, s.qs.length));
+  const inp = $("#ans");
+  const advance = () => { s.idx++; s.q = null; renderConj(); };
+  if (!q.answered) {
+    inp.focus(); bindAccents(inp);
+    const check = forced => { q.val = inp.value; const ok = forced === undefined ? norm(inp.value, state.settings.strict) === norm(c.answer, state.settings.strict) : forced; q.answered = true; q.ok = ok; record(c.key, ok); s.results.push({it: item, ok, q: c}); renderConj();
+      if (ok) setTimeout(() => { if (session === s && s.q === q) advance(); }, 900); };
+    $("#checkBtn").onclick = () => { if (inp.value.trim()) check(); else inp.focus(); };
+    $("#showBtn").onclick = () => check(false);
+    inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); if (inp.value.trim()) check(); } };
+  } else { const nb = $("#nextBtn"); nb.onclick = advance; if (!q.ok) nb.focus(); }
+}
+
+/* Summary */
+function renderSummary() {
+  const s = session; stopTimer();
+  const total = s.results.length, right = s.results.filter(r => r.ok).length;
+  const missedRes = dedupe(s.results.filter(r => !r.ok).map(r => Object.assign({}, r.it, {q: r.q})));
+  const pct = pctOf(right, total), secs = Math.round((Date.now() - s.startedAt) / 1000);
+  shell(`<div class="summary"><div class="score">${right} <span class="of">of ${total}</span></div>
+      <p class="sum-meta">${pct}% right${s.mode === "match" ? `, ${fmtTime(secs)}` : ""}</p>
+      ${missedRes.length ? `<ul class="missed">${missedRes.map(it => `<li><span>${esc(it.es)}</span><span class="en">${esc(it.en)}</span></li>`).join("")}</ul>` : `<p class="clean">Nothing missed.</p>`}</div>`,
+    `${missedRes.length ? `<button class="btn ghost" id="againBtn">Redo the ${missedRes.length} missed</button>` : ""}<button class="btn${missedRes.length ? "" : " wide"}" id="homeBtn">Back to the map</button>`,
+    "", 100);
+  $("#homeBtn").onclick = () => { session = null; renderHome(); };
+  const again = $("#againBtn");
+  if (again) again.onclick = () => {
+    if (s.mode === "conjugate") { session = {mode: "conjugate", ctx: s.ctx, items: [], idx: 0, results: [], startedAt: Date.now(), color: s.color, title: s.title, qs: shuffle(missedRes.map(m => m.q))}; renderConj(); }
+    else start(s.mode, Object.assign({}, s.ctx, {kind: "topic"}), missedRes.map(m => s.items.find(i => i.key === m.key) || m));
+  };
+}
+
+/* ── Home ── */
+function renderHome() {
+  const keys = [...new Set(ALL.map(i => i.key))];
+  const weakN = keys.filter(weak).length, knownN = keys.filter(known).length;
+  app.innerHTML = `<main class="home">
+    <header class="home-head"><div><h1>Spanish 15</h1><p class="sub">${knownN} of ${keys.length} words known so far</p></div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">${ICON_SETTINGS}</button></header>
+    <section class="express">
+      <button class="express-btn" id="weakBtn" ${weakN ? "" : "disabled"}>Weak words <span class="count">${weakN}</span></button>
+      <button class="express-btn alt" id="allBtn">Shuffle everything</button>
+    </section>
+    ${LINES.map(u => `<section class="line" style="--c:${u.color}">
+      <div class="line-head"><span class="badge">${u.num}</span><div><div class="line-title">${u.id === "verbs" ? "Verbs" : "Unit " + u.num}</div><div class="line-sub">${esc(u.title)}</div></div></div>
+      <ol class="stations">${u.topics.map(t => { const p = topicProgress(t); return `<li><button class="station" data-topic="${t.id}"><span class="dot${p >= .999 ? " done" : ""}" style="--p:${Math.round(p * 100)}%"></span><span class="st-text"><span class="st-name">${esc(t.name)}</span><span class="st-meta">${t.list.length} ${t.verbOnly ? "verbs" : "words"}, ${esc(t.day)}</span></span></button></li>`; }).join("")}</ol>
+    </section>`).join("")}
+  </main>`;
+  $("#settingsBtn").onclick = renderSettings;
+  $("#weakBtn").onclick = () => openSheet(ctxWeak());
+  $("#allBtn").onclick = () => openSheet(ctxAll());
+  $$(".station").forEach(b => b.onclick = () => openSheet(ctxTopic(TOPICS[b.dataset.topic])));
+}
+
+/* ── Mode sheet ── */
+function openSheet(ctx) {
+  const dir = state.settings.dir, weakN = ctx.items.filter(i => weak(i.key)).length;
+  const mode = (id, name, desc) => `<button class="mode" data-mode="${id}"><span><b>${name}</b><small>${desc}</small></span><span class="go">${ICON_GO}</span></button>`;
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<div class="scrim" id="scrim"><div class="sheet" style="--c:${ctx.color}" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <h2 id="sheetTitle">${esc(ctx.title)}</h2><p class="meta">${esc(ctx.meta)}</p>
+      ${ctx.verbOnly ? "" : `<div class="seg" role="group" aria-label="Which side to show first">
+        <button data-dir="es" aria-pressed="${dir === "es"}">Spanish first</button><button data-dir="en" aria-pressed="${dir === "en"}">English first</button><button data-dir="mix" aria-pressed="${dir === "mix"}">Mixed</button></div>`}
+      <div class="modes">
+        ${ctx.verbSets.length ? mode("conjugate", "Conjugate", "Type the right form for each person") : ""}
+        ${mode("flash", "Flashcards", "Tap to flip, then mark what you knew")}
+        ${mode("quiz", "Quiz", "Pick the translation from four choices")}
+        ${mode("type", "Type it", "See the English, type the Spanish")}
+        ${ctx.items.length >= 4 ? mode("match", "Match", "Pair the tiles against the clock") : ""}
+      </div>
+      ${weakN >= 3 && ctx.kind === "topic" ? `<label class="check"><input type="checkbox" id="weakOnly"> Only the ${weakN} words I keep missing</label>` : ""}
+    </div></div>`;
+  document.body.appendChild(wrap);
+  const close = () => { wrap.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  $("#scrim", wrap).onclick = e => { if (e.target.id === "scrim") close(); };
+  $$(".seg button", wrap).forEach(b => b.onclick = () => { state.settings.dir = b.dataset.dir; save(); $$(".seg button", wrap).forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $$(".mode", wrap).forEach(b => b.onclick = () => {
+    const only = $("#weakOnly", wrap); const items = only && only.checked ? ctx.items.filter(i => weak(i.key)) : ctx.items;
+    close(); start(b.dataset.mode, ctx, items);
+  });
+  $$(".mode", wrap)[0].focus();
+}
+
+/* ── Settings ── */
+function renderSettings() {
+  app.innerHTML = `<main class="home">
+    <header class="home-head"><div><h1>Settings</h1></div><button class="icon-btn" id="backBtn" aria-label="Back to the map">✕</button></header>
+    <section class="setrows">
+      <label class="row"><span><b>Strict accents</b><small>Count “esta” as wrong when the answer is “está”. Off by default so you can type fast.</small></span><input type="checkbox" id="strict" ${state.settings.strict ? "checked" : ""}></label>
+      <div class="row"><span><b>Put it on your Home Screen</b><small>Open this page in Safari, tap the Share button, then “Add to Home Screen”. It opens full-screen and works without signal.</small></span></div>
+      <div class="row"><span><b>Where the words come from</b><small>Every page in the Spanish 15 Canvas modules, Units 1–3 (Semanas 7 and 9 included). A word counts as known after you get it right twice in a row; it shows up in Weak words after a miss until you get it right three times running. Progress lives on this device only.</small></span></div>
+      <button class="row danger" id="resetBtn"><span><b>Reset progress</b><small>Clears everything you’ve marked known or missed.</small></span></button>
+    </section></main>`;
+  $("#backBtn").onclick = renderHome;
+  $("#strict").onchange = e => { state.settings.strict = e.target.checked; save(); };
+  $("#resetBtn").onclick = () => { if (confirm("Reset all progress on this device?")) { state.stats = {}; save(); renderHome(); } };
+}
+
+window.__sp15 = {conjugate, variants, matches, norm};
+renderHome();
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { navigator.serviceWorker.register("./sw.js").catch(() => {}); }
+})();
+</script>
+</body>
+</html>
