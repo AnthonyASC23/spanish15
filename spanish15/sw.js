@@ -1,10 +1,12 @@
 // Spanish 15 — service worker: caches the app shell so it works offline once installed.
-const CACHE = "sp15-v1";
-const ASSETS = ["./", "./index.html", "./vocab.js", "./manifest.webmanifest", "./icon-180.png", "./icon-192.png", "./icon-512.png",
+const CACHE = "sp15-v2";
+const CORE = ["./", "./index.html", "./vocab.js", "./manifest.webmanifest"];
+const EXTRAS = ["./icon-180.png", "./icon-192.png", "./icon-512.png",
   "./fonts/Barlow-Regular.woff2", "./fonts/Barlow-Medium.woff2", "./fonts/Barlow-SemiBold.woff2", "./fonts/BarlowCondensed-SemiBold.woff2", "./fonts/BarlowCondensed-Bold.woff2"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // Core files must cache; icons and fonts are nice-to-have (a missing fonts folder shouldn't block offline mode).
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE).then(() => Promise.allSettled(EXTRAS.map(a => c.add(a).catch(() => {}))))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
